@@ -1,4 +1,4 @@
-# Copyright 2020-2023 Gentoo Authors
+# Copyright 2020-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -15,20 +15,19 @@ S="${WORKDIR}/libX11-${PV}/"
 
 KEYWORDS="~alpha amd64 arm arm64 hppa ~ia64 ~loong ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos"
 
-# Only needed by configure
-DEPEND="
-	x11-base/xorg-proto
-	>=x11-libs/libxcb-1.11.1
-	x11-libs/xtrans"
-RDEPEND=""
-
 XORG_CONFIGURE_OPTIONS=(
 	--without-xmlto
 	--without-fop
 	--disable-specs
 	--disable-xkb
-	--with-keysymdefdir="${ESYSROOT}/usr/include/X11"
+	--with-keysymdefdir="${S}"
 )
+
+src_prepare() {
+default
+touch keysymdef.h || die
+sed -i -e 's/pkg_failed=yes/pkg_failed=no/g' configure || die
+}
 
 src_compile() {
 	emake -C nls
